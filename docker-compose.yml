@@ -1,0 +1,25 @@
+# Fichier: /kollab/docker-compose.yml
+version: '3.8'
+
+services:
+  # Service pour le backend (serveur Node.js)
+  server:
+    build:
+      context: ./server  # Indique où trouver le Dockerfile
+    ports:
+      - "5001:5001"      # Rend le port 5001 du conteneur accessible sur le port 5001 de ta machine
+    volumes:
+      - ./server:/usr/src/app         # Monte le dossier local dans le conteneur pour le hot-reload
+      - /usr/src/app/node_modules   # Exclut node_modules du montage pour utiliser ceux du conteneur
+
+  # Service pour le frontend (client React)
+  client:
+    build:
+      context: ./client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - server           # Indique que le client doit démarrer après le serveur
