@@ -5,6 +5,7 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import WorkspaceDetailPage from './pages/WorkspaceDetailPage';
 import PrivateRoute from './components/PrivateRoute';
+import ProjectBoardPage from './pages/ProjectBoardPage';
 
 function App() {
   return (
@@ -18,6 +19,9 @@ function App() {
 
           <Route element={<PrivateRoute />}>
             <Route path="/workspaces/:workspaceId" element={<WorkspaceDetailPage />} />
+          </Route>
+          <Route element={<PrivateRoute />}>
+          <Route path="/projects/:projectId" element={<ProjectBoardPage />} />
           </Route>
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
