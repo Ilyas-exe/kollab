@@ -6,6 +6,7 @@ import DashboardPage from './pages/DashboardPage';
 import WorkspaceDetailPage from './pages/WorkspaceDetailPage';
 import PrivateRoute from './components/PrivateRoute';
 import ProjectBoardPage from './pages/ProjectBoardPage';
+import AcceptInvitationPage from './pages/AcceptInvitationPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
           
 
           <Route element={<PrivateRoute />}>
