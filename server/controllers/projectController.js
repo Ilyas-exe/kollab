@@ -35,3 +35,14 @@ export const getProjectsForWorkspace = async (req, res) => {
     res.json(projects);
 };
 
+// Dans projectController.js
+export const getMyAssignedProjects = async (req, res) => {
+    try {
+        // Trouve tous les projets où l'utilisateur est membre
+        const projects = await Project.find({ members: { $in: [req.user.id] } })
+                                      .populate('workspaceId', 'name'); // Ajoute le nom du workspace
+        res.json(projects);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
