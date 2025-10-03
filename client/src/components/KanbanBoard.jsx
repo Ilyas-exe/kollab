@@ -1,8 +1,8 @@
 import React from 'react';
-import KanbanColumn from './KanbanColumn';
+import { DragDropContext } from '@hello-pangea/dnd';
+import KanbanColumn from './KanbanColumn.jsx';
 
-const KanbanBoard = ({ tasks }) => {
-  // Organize the tasks fetched from the API into columns
+const KanbanBoard = ({ tasks, onDragEnd }) => {
   const columns = {
     'To Do': tasks.filter(task => task.status === 'To Do'),
     'In Progress': tasks.filter(task => task.status === 'In Progress'),
@@ -10,11 +10,13 @@ const KanbanBoard = ({ tasks }) => {
   };
 
   return (
-    <div className="flex space-x-4 p-4 overflow-x-auto">
-      <KanbanColumn title="To Do" tasks={columns['To Do']} />
-      <KanbanColumn title="In Progress" tasks={columns['In Progress']} />
-      <KanbanColumn title="Done" tasks={columns['Done']} />
-    </div>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="flex space-x-4 p-4 overflow-x-auto">
+        {Object.entries(columns).map(([title, tasks]) => (
+          <KanbanColumn key={title} title={title} tasks={tasks} />
+        ))}
+      </div>
+    </DragDropContext>
   );
 };
 
