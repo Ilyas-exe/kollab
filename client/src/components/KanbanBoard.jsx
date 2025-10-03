@@ -11,7 +11,7 @@ const KanbanBoard = ({ tasks, onDragEnd }) => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex space-x-4 p-4 overflow-x-auto">
+      <div className="flex space-x-4 p-4 overflow-x-auto bg-gray-200 rounded-lg">
         {Object.entries(columns).map(([title, tasks]) => (
           <KanbanColumn key={title} title={title} tasks={tasks} />
         ))}
