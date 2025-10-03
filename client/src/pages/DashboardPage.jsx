@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const DashboardPage = () => {
   const [workspaces, setWorkspaces] = useState([]);
@@ -44,9 +45,15 @@ const DashboardPage = () => {
       <div className="space-y-4">
         {workspaces.length > 0 ? (
           workspaces.map(ws => (
-            <div key={ws._id} className="p-4 bg-white rounded shadow">
-              <h3 className="font-bold">{ws.name}</h3>
-            </div>
+            // --- THIS IS THE CHANGE ---
+            <Link 
+              to={`/workspaces/${ws._id}`} 
+              key={ws._id} 
+              className="block p-4 bg-white rounded shadow hover:bg-gray-50 transition-colors"
+            >
+              <h3 className="font-bold text-gray-800">{ws.name}</h3>
+            </Link>
+            // --- END OF CHANGE ---
           ))
         ) : (
           <p>You don't have any workspaces yet. Create one!</p>
