@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import workspaceRoutes from './routes/workspaceRoutes.js';
+import taskRoutes from './routes/taskRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 // --- 1. Configuration initiale ---
@@ -36,6 +37,8 @@ app.use('/api/projects', projectRoutes);
 
 // Routes pour les espaces de travail
 app.use('/api/workspaces', workspaceRoutes);
+
+app.use('/api/tasks', taskRoutes);
 
 // --- 5. Middlewares pour la gestion des erreurs ---
 // Ces middlewares doivent être les derniers à être utilisés par l'application
