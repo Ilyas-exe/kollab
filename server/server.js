@@ -1,4 +1,4 @@
-// server/server.js
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 
 // Importation des routes et middlewares
 import userRoutes from './routes/userRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
 import workspaceRoutes from './routes/workspaceRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
@@ -30,6 +31,8 @@ app.get('/api/health', (req, res) => {
 
 // Routes pour l'authentification et les utilisateurs
 app.use('/api/users', userRoutes);
+
+app.use('/api/projects', projectRoutes);
 
 // Routes pour les espaces de travail
 app.use('/api/workspaces', workspaceRoutes);
