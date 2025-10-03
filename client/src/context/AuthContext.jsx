@@ -6,16 +6,21 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
+// --- THIS IS THE FIX ---
+// Create the apiClient instance OUTSIDE of the component.
+// This ensures there is only ONE instance for the entire app.
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+});
+// --------------------
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
   const navigate = useNavigate();
 
-  const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
-  });
-
   useEffect(() => {
+    // This effect now correctly modifies the single apiClient instance's headers.
     if (token) {
       apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       localStorage.setItem('token', token);
@@ -33,9 +38,7 @@ export const AuthProvider = ({ children }) => {
   };
   
   const register = async (name, email, password) => {
-    // MODIFICATION : On n'attend plus de données utilisateur en retour.
     await apiClient.post('/users/register', { name, email, password });
-    // On redirige vers la page de connexion avec un message.
     navigate('/login', { 
       state: { message: 'Registration successful! Please log in.' } 
     });
