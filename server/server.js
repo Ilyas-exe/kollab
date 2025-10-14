@@ -9,7 +9,9 @@ import userRoutes from './routes/userRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import workspaceRoutes from './routes/workspaceRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
+import invitationRoutes from './routes/invitationRoutes.js'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+import invoiceRoutes from './routes/invoiceRoutes.js';
 
 // --- 1. Configuration initiale ---
 dotenv.config(); // Charge les variables du fichier .env
@@ -39,6 +41,10 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/workspaces', workspaceRoutes);
 
 app.use('/api/tasks', taskRoutes);
+
+app.use('/api/invitations', invitationRoutes);
+
+app.use('/api/invoices', invoiceRoutes);
 
 // --- 5. Middlewares pour la gestion des erreurs ---
 // Ces middlewares doivent être les derniers à être utilisés par l'application
