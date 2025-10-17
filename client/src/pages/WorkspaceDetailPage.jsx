@@ -14,7 +14,7 @@ const WorkspaceDetailPage = () => {
   const fetchProjects = async () => {
     try {
       const { data } = await apiClient.get(`/workspaces/${workspaceId}/projects`);
-      setProjects(data);
+      setProjects(data.projects || []);
     } catch (error) {
       console.error("Failed to fetch projects", error);
     }

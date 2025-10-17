@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import ChatTester from '../components/ChatTester'
 
 // Vue Freelancer (plus robuste)
 const FreelancerView = ({ projects = [] }) => ( // On initialise "projects" à un tableau vide
@@ -135,6 +136,7 @@ const DashboardPage = () => {
             {user.role === 'Freelancer' && (
                 <FreelancerView projects={data} />
             )}
+            <ChatTester />
         </div>
     );
 };
