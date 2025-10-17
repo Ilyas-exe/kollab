@@ -58,9 +58,22 @@ export const createInvoice = async (req, res) => {
 // @route   GET /api/projects/:projectId/invoices
 // @access  Private
 export const getInvoicesForProject = async (req, res) => {
+    const limit = Number(req.query.limit) || 10;
+    const page = Number(req.query.page) || 1;
+    const projectId = req.params.projectId;
+
     try {
-        const invoices = await Invoice.find({ projectId: req.params.projectId });
-        res.json(invoices);
+        const count = await Invoice.countDocuments({ projectId: projectId });
+        const invoices = await Invoice.find({ projectId: projectId })
+                                       .limit(limit)
+                                       .skip(limit * (page - 1));
+
+        res.json({
+            invoices,
+            page,
+            pages: Math.ceil(count / limit),
+            total: count
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }
