@@ -18,6 +18,21 @@ import paymentRoutes from './routes/paymentRoutes.js';
 dotenv.config(); // Charge les variables du fichier .env
 const app = express();
 
+// Stripe webhook needs raw body, so we add its route before express.json()
+app.post('/api/payments/stripe-webhook', express.raw({ type: 'application/json' }), (req, res) => {
+    // Forward the raw request to your controller logic.
+    // This is a common pattern to handle raw bodies for specific routes.
+    // We find the webhook handler in the router and call it manually.
+    const webhookRoute = paymentRoutes.stack.find(
+        (layer) => layer.route && layer.route.path === '/stripe-webhook' && layer.route.methods.post
+    );
+    if (webhookRoute) {
+        webhookRoute.handle(req, res);
+    } else {
+        res.status(404).send('Webhook handler not found');
+    }
+});
+
 // --- 2. Middlewares de base ---
 app.use(cors()); // Active le Cross-Origin Resource Sharing
 app.use(express.json()); // Permet au serveur de comprendre le JSON envoyé par le client
