@@ -31,11 +31,24 @@ export const createProject = async (req, res) => {
 // @route   GET /api/workspaces/:workspaceId/projects
 // @access  Private
 export const getProjectsForWorkspace = async (req, res) => {
-    const limit = Number(req.query.limit) || 10;
-    const page = Number(req.query.page) || 1;
-    const workspaceId = req.params.workspaceId;
-
     try {
+        const workspaceId = req.params.workspaceId;
+        const userId = req.user._id;
+
+        // --- LA CORRECTION DE SÉCURITÉ EST ICI ---
+        // 1. On cherche le workspace
+        const workspace = await Workspace.findById(workspaceId);
+
+        // 2. On vérifie si le workspace existe ET si l'utilisateur est bien membre
+        if (!workspace || !workspace.members.includes(userId)) {
+            return res.status(403).json({ message: 'Not authorized to access this workspace' }); // 403 Forbidden est plus précis
+        }
+        // --- FIN DE LA CORRECTION ---
+
+        // Le reste de la logique ne change pas
+        const limit = Number(req.query.limit) || 10;
+        const page = Number(req.query.page) || 1;
+
         const count = await Project.countDocuments({ workspaceId: workspaceId });
         const projects = await Project.find({ workspaceId: workspaceId })
                                       .populate('members', 'name')
@@ -43,12 +56,13 @@ export const getProjectsForWorkspace = async (req, res) => {
                                       .skip(limit * (page - 1));
         
         res.json({
-            projects,
+            projects: projects, // On renvoie l'objet complet
             page,
             pages: Math.ceil(count / limit),
             total: count
         });
     } catch (error) {
+        console.error("Error in getProjectsForWorkspace:", error);
         res.status(500).json({ message: 'Server Error' });
     }
 };
@@ -59,8 +73,13 @@ export const getProjectsForWorkspace = async (req, res) => {
 export const getProjectById = async (req, res) => {
     try {
         const project = await Project.findById(req.params.id)
-                                     .populate('members', 'name email'); // Populate members' details
+                                     .populate('members', 'name email'); // On enrichit avec les détails des membres
+
         if (project) {
+            // Vérification de sécurité : l'utilisateur fait-il partie des membres ?
+            if (!project.members.some(member => member._id.equals(req.user._id))) {
+                return res.status(403).json({ message: 'Not authorized to access this project' });
+            }
             res.json(project);
         } else {
             res.status(404).json({ message: 'Project not found' });
