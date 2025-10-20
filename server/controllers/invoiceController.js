@@ -1,10 +1,10 @@
 // Fichier: /server/controllers/invoiceController.js
-
 import Invoice from '../models/Invoice.js';
 import Project from '../models/Project.js';
 import User from '../models/User.js';
 import Workspace from '../models/Workspace.js';
 import PDFDocument from 'pdfkit';
+import { createNotification } from '../utils/notificationService.js'; // <-- MODIFICATION
 
 // @desc    Create a new invoice
 // @route   POST /api/invoices
@@ -29,11 +29,7 @@ export const createInvoice = async (req, res) => {
              client = await User.findById(workspace.owner);
         }
 
-
-        // Calculer le total
         const totalAmount = lineItems.reduce((sum, item) => sum + item.amount, 0);
-
-        // Générer un numéro de facture simple (à améliorer plus tard)
         const invoiceNumber = `INV-${Date.now()}`;
 
         const invoice = new Invoice({
@@ -47,6 +43,15 @@ export const createInvoice = async (req, res) => {
         });
 
         const createdInvoice = await invoice.save();
+
+        // --- AJOUT DE LA NOTIFICATION ---
+        if (client) {
+             const text = `A new invoice (${invoice.invoiceNumber}) has been created for your project "${project.name}".`;
+             const link = `/projects/${projectId}/invoices`; // Lien hypothétique vers la future page de factures
+             await createNotification(client._id, text, link);
+        }
+        // --- FIN DE L'AJOUT ---
+
         res.status(201).json(createdInvoice);
     } catch (error) {
         console.error("Error creating invoice:", error);
@@ -94,23 +99,16 @@ export const downloadInvoice = async (req, res) => {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename=${invoice.invoiceNumber || 'invoice'}.pdf`);
         doc.pipe(res);
-
-        // --- Construction du PDF (Version Robuste) ---
+        
         const generateHr = (y) => doc.strokeColor("#aaaaaa").lineWidth(1).moveTo(50, y).lineTo(550, y).stroke();
-
-        // Header
         doc.fontSize(20).text('INVOICE', { align: 'center' });
         doc.moveDown(2);
-
-        // Informations
         const infoTop = doc.y;
         doc.fontSize(10)
             .text(`Invoice Number: ${invoice.invoiceNumber || 'N/A'}`, 50, infoTop)
             .text(`Issue Date: ${invoice.issueDate ? new Date(invoice.issueDate).toLocaleDateString() : 'N/A'}`, { align: 'right' })
             .text(`Project: ${invoice.projectName || 'N/A'}`, 50, infoTop + 15)
             .moveDown(2);
-
-        // Billed to / From
         const customerInfoTop = doc.y;
         doc.text(`Billed To:`, 50, customerInfoTop)
             .font('Helvetica-Bold').text(invoice.clientName || 'Unknown Client', 50, customerInfoTop + 15)
@@ -118,8 +116,6 @@ export const downloadInvoice = async (req, res) => {
             .font('Helvetica-Bold').text(invoice.freelancerId?.name || 'Unknown Freelancer', 300, customerInfoTop + 15)
             .font('Helvetica').text(invoice.freelancerId?.email || '', 300, customerInfoTop + 30)
             .moveDown(3);
-
-        // En-tête du tableau
         const invoiceTableTop = doc.y;
         doc.font('Helvetica-Bold');
         doc.text('Description', 50, invoiceTableTop)
@@ -127,8 +123,6 @@ export const downloadInvoice = async (req, res) => {
         generateHr(invoiceTableTop + 20);
         doc.font('Helvetica');
         doc.moveDown();
-
-        // Lignes du tableau
         let position = invoiceTableTop + 30;
         if (invoice.lineItems && Array.isArray(invoice.lineItems)) {
             invoice.lineItems.forEach(item => {
@@ -138,13 +132,10 @@ export const downloadInvoice = async (req, res) => {
                 doc.text(description, 50, position, { width: 380 })
                    .text(`$${amount}`, 450, position, { width: 90, align: 'right' });
                 
-                // On calcule la hauteur du texte pour savoir où placer la ligne suivante
                 const textHeight = doc.heightOfString(description, { width: 380 });
                 position += textHeight + 10;
             });
         }
-
-        // Ligne de fin de tableau et Total
         generateHr(position);
         doc.moveDown();
         const totalAmount = typeof invoice.totalAmount === 'number' ? invoice.totalAmount.toFixed(2) : '0.00';
@@ -152,7 +143,6 @@ export const downloadInvoice = async (req, res) => {
            .text('Total:', 300, position + 10)
            .text(`$${totalAmount}`, 450, position + 10, { width: 90, align: 'right' });
         
-        // Finaliser le PDF
         doc.end();
 
     } catch (error) {
