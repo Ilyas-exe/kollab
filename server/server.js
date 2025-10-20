@@ -17,13 +17,6 @@ import invoiceRoutes from "./routes/invoiceRoutes.js";
 import { socketProtect } from "./middleware/socketAuthMiddleware.js";
 import Message from "./models/Message.js";
 import Project from "./models/Project.js";
-import userRoutes from './routes/userRoutes.js';
-import projectRoutes from './routes/projectRoutes.js';
-import workspaceRoutes from './routes/workspaceRoutes.js';
-import taskRoutes from './routes/taskRoutes.js';
-import invitationRoutes from './routes/invitationRoutes.js'
-import { notFound, errorHandler } from './middleware/errorMiddleware.js';
-import invoiceRoutes from './routes/invoiceRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 
 // --- 1. Configuration initiale ---
@@ -39,6 +32,7 @@ const io = new Server(httpServer, {
     allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
+});
   // ------------------------------------
 // Stripe webhook needs raw body, so we add its route before express.json()
 app.post('/api/payments/stripe-webhook', express.raw({ type: 'application/json' }), (req, res) => {
