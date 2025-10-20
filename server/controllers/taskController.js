@@ -1,4 +1,5 @@
 import Task from '../models/Task.js';
+import { createNotification } from '../utils/notificationService.js'; // <-- MODIFICATION
 
 // @desc    Create a new task
 // @route   POST /api/tasks
@@ -16,15 +17,23 @@ const createTask = async (req, res) => {
     });
 
     const createdTask = await task.save();
+
+    // --- AJOUT DE LA NOTIFICATION ---
+    if (assigneeId) {
+        const text = `You have been assigned a new task: "${title}"`;
+        const link = `/projects/${projectId}`;
+        await createNotification(assigneeId, text, link);
+    }
+    // --- FIN DE L'AJOUT ---
+
     res.status(201).json(createdTask);
 };
 
 // @desc    Get all tasks for a specific project with pagination
 // @route   GET /api/projects/:projectId/tasks
 const getTasksForProject = async (req, res) => {
-    const limit = Number(req.query.limit) || 10; // Default to 10 items per page
-    const page = Number(req.query.page) || 1;    // Default to the first page
-
+    const limit = Number(req.query.limit) || 10;
+    const page = Number(req.query.page) || 1;
     const projectId = req.params.projectId;
 
     try {
@@ -52,12 +61,24 @@ const updateTask = async (req, res) => {
     const task = await Task.findById(req.params.taskId);
 
     if (task) {
+        const oldAssignee = task.assigneeId; // Sauvegarde de l'ancien assigné
+
         task.title = title || task.title;
         task.description = description || task.description;
         task.status = status || task.status;
         task.assigneeId = assigneeId || task.assigneeId;
 
         const updatedTask = await task.save();
+
+        // --- AJOUT DE LA NOTIFICATION ---
+        // Notifier seulement si l'assigné change et n'est pas nul
+        if (updatedTask.assigneeId && !updatedTask.assigneeId.equals(oldAssignee)) {
+            const text = `You have been assigned to the task: "${updatedTask.title}"`;
+            const link = `/projects/${updatedTask.projectId}`;
+            await createNotification(updatedTask.assigneeId, text, link);
+        }
+        // --- FIN DE L'AJOUT ---
+
         res.json(updatedTask);
     } else {
         res.status(404).json({ message: 'Task not found' });
