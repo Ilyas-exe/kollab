@@ -152,3 +152,36 @@ export const downloadInvoice = async (req, res) => {
         }
     }
 };
+
+// @desc    Update an invoice
+// @route   PUT /api/invoices/:invoiceId
+export const updateInvoice = async (req, res) => {
+    const { lineItems, status } = req.body;
+    try {
+        const invoice = await Invoice.findById(req.params.invoiceId);
+        if (!invoice) {
+            return res.status(404).json({ message: 'Invoice not found' });
+        }
+        // --- SECURITY CHECK (Only creator can update) ---
+        if (invoice.freelancerId.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'User is not the creator of this invoice' });
+        }
+        // --- END SECURITY CHECK ---
+        
+        // Business Rule: Only allow edits if status is 'Draft'
+        if (invoice.status !== 'Draft') {
+            return res.status(400).json({ message: 'Cannot edit an invoice that has already been sent or paid' });
+        }
+
+        if (lineItems) {
+            invoice.lineItems = lineItems;
+            invoice.totalAmount = lineItems.reduce((sum, item) => sum + item.amount, 0);
+        }
+        if (status) invoice.status = status; // e.g., to change to 'Sent'
+
+        const updatedInvoice = await invoice.save();
+        res.json(updatedInvoice);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};

@@ -1,4 +1,5 @@
 import Task from '../models/Task.js';
+import Project from '../models/Project.js';
 import { createNotification } from '../utils/notificationService.js'; // <-- MODIFICATION
 
 // @desc    Create a new task
@@ -54,35 +55,69 @@ const getTasksForProject = async (req, res) => {
     }
 };
 
-// @desc    Update a task (e.g., change its status)
+// @desc    Update a task
 // @route   PUT /api/tasks/:taskId
 const updateTask = async (req, res) => {
     const { title, description, status, assigneeId } = req.body;
-    const task = await Task.findById(req.params.taskId);
+    
+    try {
+        const task = await Task.findById(req.params.taskId);
 
-    if (task) {
-        const oldAssignee = task.assigneeId; // Sauvegarde de l'ancien assigné
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        // --- SECURITY CHECK ---
+        const project = await Project.findById(task.projectId);
+        if (!project.members.includes(req.user._id)) {
+            return res.status(403).json({ message: 'User is not a member of this project' });
+        }
+        // --- END SECURITY CHECK ---
+
+        const oldAssignee = task.assigneeId;
 
         task.title = title || task.title;
-        task.description = description || task.description;
+        task.description = description !== undefined ? description : task.description;
         task.status = status || task.status;
-        task.assigneeId = assigneeId || task.assigneeId;
+        task.assigneeId = assigneeId !== undefined ? assigneeId : task.assigneeId;
 
         const updatedTask = await task.save();
 
-        // --- AJOUT DE LA NOTIFICATION ---
-        // Notifier seulement si l'assigné change et n'est pas nul
         if (updatedTask.assigneeId && !updatedTask.assigneeId.equals(oldAssignee)) {
             const text = `You have been assigned to the task: "${updatedTask.title}"`;
             const link = `/projects/${updatedTask.projectId}`;
             await createNotification(updatedTask.assigneeId, text, link);
         }
-        // --- FIN DE L'AJOUT ---
 
         res.json(updatedTask);
-    } else {
-        res.status(404).json({ message: 'Task not found' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
     }
 };
 
-export { createTask, getTasksForProject, updateTask };
+// --- NEW FUNCTION ---
+// @desc    Delete a task
+// @route   DELETE /api/tasks/:taskId
+const deleteTask = async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.taskId);
+
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        // --- SECURITY CHECK ---
+        const project = await Project.findById(task.projectId);
+        if (!project.members.includes(req.user._id)) {
+            return res.status(403).json({ message: 'User is not a member of this project' });
+        }
+        // --- END SECURITY CHECK ---
+
+        await task.deleteOne();
+        res.json({ message: 'Task removed' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+export { createTask, getTasksForProject, updateTask, deleteTask };

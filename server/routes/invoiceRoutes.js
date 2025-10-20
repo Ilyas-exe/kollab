@@ -10,4 +10,6 @@ router.post('/', protect, createInvoice);
 // Télécharger une facture spécifique en PDF
 router.get('/:invoiceId/download', protect, downloadInvoice);
 
+router.route('/:invoiceId').put(protect, updateInvoice);
+
 export default router;

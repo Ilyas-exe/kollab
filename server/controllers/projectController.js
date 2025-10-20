@@ -99,3 +99,48 @@ export const getMyAssignedProjects = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
+// @desc    Update a project
+// @route   PUT /api/projects/:id
+export const updateProject = async (req, res) => {
+    const { name } = req.body;
+    try {
+        const project = await Project.findById(req.params.id).populate('workspaceId');
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+        // --- SECURITY CHECK (Only workspace owner can update) ---
+        if (project.workspaceId.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'User is not the owner of this workspace' });
+        }
+        // --- END SECURITY CHECK ---
+        project.name = name || project.name;
+        const updatedProject = await project.save();
+        res.json(updatedProject);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Delete a project
+// @route   DELETE /api/projects/:id
+export const deleteProject = async (req, res) => {
+    try {
+        const project = await Project.findById(req.params.id).populate('workspaceId');
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+        // --- SECURITY CHECK (Only workspace owner can delete) ---
+        if (project.workspaceId.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'User is not the owner of this workspace' });
+        }
+        // --- END SECURITY CHECK ---
+
+        // Also delete all tasks within this project
+        await Task.deleteMany({ projectId: project._id });
+        await project.deleteOne();
+        res.json({ message: 'Project and all its tasks removed' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
