@@ -51,6 +51,9 @@ const InvoiceSchema = new mongoose.Schema({
     issueDate: {
         type: Date,
         default: Date.now
+    },
+    stripePaymentIntentId: {
+        type: String
     }
 }, { timestamps: true });
 
