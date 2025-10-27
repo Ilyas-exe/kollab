@@ -1,13 +1,16 @@
-// Fichier: /client/src/layouts/MainLayout.jsx
+// src/layouts/MainLayout.jsx
+
 import { Outlet } from 'react-router-dom';
-import Header from '../components/Header';
+import Header from '../components/Header'; // We will update Header next
 
 const MainLayout = () => {
   return (
-    <div>
+    // Use the new 'background' color for the entire page
+    <div className="bg-background min-h-screen">
       <Header />
-      <main>
-        <Outlet /> {/* C'est ici que le contenu de vos pages s'affichera */}
+      <main className="container mx-auto p-6">
+        {/* This <Outlet> is where React Router will render the active page */}
+        <Outlet /> 
       </main>
     </div>
   );
