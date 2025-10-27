@@ -1,97 +1,149 @@
-// Fichier: /client/src/pages/AcceptInvitationPage.jsx
+// src/pages/AcceptInvitationPage.jsx
+
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios'; // On utilise axios directement car l'utilisateur n'est pas encore authentifié
+import { useAuth } from '../context/AuthContext';
 
 const AcceptInvitationPage = () => {
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
-    const token = searchParams.get('token');
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { apiClient } = useAuth(); // We use apiClient to make public requests too
 
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [invitation, setInvitation] = useState(null);
-    const [formData, setFormData] = useState({ name: '', password: '' });
+  // State for the form
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  
+  // State for invitation details
+  const [invitation, setInvitation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-    useEffect(() => {
-        if (!token) {
-            setError('Invitation token is missing.');
-            setLoading(false);
-            return;
+  const token = searchParams.get('token');
+
+  useEffect(() => {
+    if (!token) {
+      setError('No invitation token found. Please use the link from your email.');
+      setLoading(false);
+      return;
+    }
+
+    const verifyToken = async () => {
+      try {
+        const { data } = await apiClient.get(`/invitations/${token}`);
+        if (data.success) {
+          setInvitation(data);
+        } else {
+          setError(data.message);
         }
-
-        const verifyToken = async () => {
-            try {
-                // IMPORTANT: Utiliser l'URL complète de l'API depuis le .env
-                const API_URL = import.meta.env.VITE_API_URL;
-                // Note: La route de vérification doit être créée côté backend (GET /api/invitations/:token)
-                const { data } = await axios.get(`${API_URL}/invitations/${token}`);
-                setInvitation(data);
-            } catch (err) {
-                setError('This invitation is invalid or has expired.');
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        verifyToken();
-    }, [token]);
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+      } catch (err) {
+        setError('Invalid or expired invitation link.');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-        try {
-            const API_URL = import.meta.env.VITE_API_URL;
-            // Note: La route d'acceptation doit être créée côté backend (POST /api/invitations/accept)
-            await axios.post(`${API_URL}/invitations/accept`, {
-                token,
-                name: formData.name,
-                password: formData.password,
-            });
-            // Si l'inscription réussit, on redirige vers la page de connexion
-            navigate('/login');
-        } catch (err) {
-            setError(err.response?.data?.message || 'Failed to create account.');
-            setLoading(false);
-        }
-    };
+    verifyToken();
+  }, [token, apiClient]);
 
-    if (loading) return <div className="text-center mt-10">Verifying invitation...</div>;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-    if (error) return (
-        <div className="text-center mt-10 text-red-500">
-            <p>{error}</p>
-            <Link to="/login" className="text-blue-500">Go to Login</Link>
+    try {
+      await apiClient.post('/invitations/accept', { token, name, password });
+      // On success, redirect to the login page with a success message
+      navigate('/login', {
+        state: { message: 'Account created successfully! You can now log in.' }
+      });
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create account. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderContent = () => {
+    if (loading) {
+      return <p className="text-center text-text-secondary">Verifying invitation...</p>;
+    }
+
+    if (error || !invitation) {
+      return (
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-danger mb-4">Invitation Error</h2>
+          <p className="text-text-secondary">{error}</p>
+          <Link to="/login" className="mt-4 inline-block text-primary hover:underline">Go to Login</Link>
         </div>
-    );
-    
+      );
+    }
+
     return (
-        <div className="flex justify-center items-center h-screen bg-gray-100">
-            <div className="w-full max-w-md p-8 space-y-3 bg-white rounded-lg shadow">
-                <h1 className="text-2xl font-bold text-center">Join Project on Kollab</h1>
-                <p className="text-center text-gray-600">You've been invited to join the project: <strong>{invitation?.project?.name}</strong>. Create an account to accept.</p>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block mb-1 text-sm">Your Name</label>
-                        <input type="text" name="name" onChange={handleChange} required className="w-full px-4 py-2 border rounded-md" />
-                    </div>
-                    <div>
-                        <label className="block mb-1 text-sm">Choose a Password</label>
-                        <input type="password" name="password" onChange={handleChange} required className="w-full px-4 py-2 border rounded-md" />
-                    </div>
-                    <button type="submit" disabled={loading} className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-md disabled:bg-blue-300">
-                        {loading ? 'Creating Account...' : 'Accept & Join'}
-                    </button>
-                </form>
-            </div>
+      <>
+        <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-text-primary">Join Project on Kollab</h2>
+            <p className="text-text-secondary mt-2">
+                You've been invited to join the project: <span className="font-bold text-primary">{invitation.project.name}</span>
+            </p>
         </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="email" className="text-sm font-medium text-text-secondary block mb-2">Email Address</label>
+            <input 
+              id="email" 
+              type="email" 
+              value={invitation.email} 
+              readOnly 
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500" 
+            />
+          </div>
+
+          <div>
+            <label htmlFor="name" className="text-sm font-medium text-text-secondary block mb-2">Full Name</label>
+            <input 
+              id="name" 
+              type="text" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              required 
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" 
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="text-sm font-medium text-text-secondary block mb-2">Create a Password</label>
+            <input 
+              id="password" 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              required 
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" 
+            />
+          </div>
+
+          <div>
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
+            >
+              {loading ? 'Creating Account...' : 'Accept Invitation & Create Account'}
+            </button>
+          </div>
+        </form>
+      </>
     );
+  };
+  
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="w-full max-w-md p-8 bg-surface rounded-lg shadow-md">
+        {renderContent()}
+      </div>
+    </div>
+  );
 };
 
 export default AcceptInvitationPage;

@@ -1,11 +1,11 @@
-// Fichier: /client/src/pages/ProjectBoardPage.jsx (Version Finale Corrigée)
+// src/pages/ProjectBoardPage.jsx
+
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import KanbanBoard from '../components/KanbanBoard';
 import CreateTaskModal from '../components/CreateTaskModal';
 import InviteFreelancerModal from '../components/InviteFreelancerModal';
-import ChatTester from '../components/ChatTester'; // Assurez-vous que l'import est là
 
 const ProjectBoardPage = () => {
     const [project, setProject] = useState(null);
@@ -21,8 +21,12 @@ const ProjectBoardPage = () => {
             setLoading(true);
             const projectRes = await apiClient.get(`/projects/${projectId}`);
             const tasksRes = await apiClient.get(`/projects/${projectId}/tasks`);
+            
             setProject(projectRes.data);
-            setTasks(tasksRes.data.tasks || []);
+            // --- THIS IS THE FIX ---
+            setTasks(tasksRes.data.tasks); // We need the .tasks array from the response
+            // --- END OF FIX ---
+
         } catch (error) {
             console.error("Failed to fetch project data", error);
         } finally {
@@ -35,7 +39,7 @@ const ProjectBoardPage = () => {
     }, [projectId, apiClient]);
 
     const handleTaskCreated = () => {
-        fetchProjectData(); 
+        fetchProjectData();
     };
 
     const handleDragEnd = async (result) => {
@@ -45,7 +49,11 @@ const ProjectBoardPage = () => {
         }
         const newStatus = destination.droppableId;
         const originalTasks = [...tasks];
-        setTasks(prevTasks => prevTasks.map(t => t._id === draggableId ? { ...t, status: newStatus } : t));
+        setTasks(prevTasks =>
+            prevTasks.map(t =>
+                t._id === draggableId ? { ...t, status: newStatus } : t
+            )
+        );
         try {
             await apiClient.put(`/tasks/${draggableId}`, { status: newStatus });
         } catch (error) {
@@ -55,7 +63,7 @@ const ProjectBoardPage = () => {
     };
 
     if (loading) {
-        return <div className="p-8">Loading board...</div>;
+        return <div>Loading board...</div>;
     }
 
     return (
@@ -63,19 +71,22 @@ const ProjectBoardPage = () => {
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-3xl font-bold">{project ? project.name : 'Kanban Board'}</h1>
                 <div className="flex space-x-2">
-                    <button onClick={() => setIsInviteModalOpen(true)} className="bg-blue-500 text-white px-4 py-2 rounded">
+                    <button
+                        onClick={() => setIsInviteModalOpen(true)}
+                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                    >
                         + Invite Freelancer
                     </button>
-                    <button onClick={() => setIsTaskModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded">
+                    <button
+                        onClick={() => setIsTaskModalOpen(true)}
+                        className="bg-green-500 text-white px-4 py-2 rounded"
+                    >
                         + New Task
                     </button>
                 </div>
             </div>
 
             <KanbanBoard tasks={tasks} onDragEnd={handleDragEnd} />
-
-            {/* --- LE CHAT DYNAMIQUE EST ICI --- */}
-            {projectId && <ChatTester projectId={projectId} />}
 
             {isTaskModalOpen && (
                 <CreateTaskModal

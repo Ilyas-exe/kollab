@@ -30,16 +30,17 @@ function App() {
 
           {/* This is the new structure for Private Routes */}
           <Route 
-            element={
-              <PrivateRoute>
-                <MainLayout />
-              </PrivateRoute>
-            }
-          >
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/workspaces/:workspaceId" element={<WorkspaceDetailPage />} />
-            <Route path="/projects/:projectId" element={<ProjectBoardPage />} />
-          </Route>
+            path="/dashboard" 
+            element={<PrivateRoute><MainLayout><DashboardPage /></MainLayout></PrivateRoute>} 
+          />
+          <Route 
+            path="/workspaces/:workspaceId" 
+            element={<PrivateRoute><MainLayout><WorkspaceDetailPage /></MainLayout></PrivateRoute>} 
+          />
+          <Route 
+            path="/projects/:projectId" 
+            element={<PrivateRoute><MainLayout><ProjectBoardPage /></MainLayout></PrivateRoute>} 
+          />
         </Routes>
       </AuthProvider>
     </Router>
