@@ -63,15 +63,30 @@ export const createInvoice = async (req, res) => {
 // @route   GET /api/projects/:projectId/invoices
 // @access  Private
 export const getInvoicesForProject = async (req, res) => {
-    const limit = Number(req.query.limit) || 10;
+    const limit = Number(req.query.limit) || 100; // Increased default limit
     const page = Number(req.query.page) || 1;
     const projectId = req.params.projectId;
+    const userId = req.user._id;
+    const userRole = req.user.role;
 
     try {
-        const count = await Invoice.countDocuments({ projectId: projectId });
-        const invoices = await Invoice.find({ projectId: projectId })
+        let query = { projectId: projectId };
+
+        // FILTERING LOGIC:
+        // - Freelancers: See only THEIR invoices (all statuses)
+        // - Clients: See ALL invoices EXCEPT Draft status
+        if (userRole === 'Freelancer') {
+            query.freelancerId = userId; // Filter by freelancer ID
+        } else {
+            // Client sees all invoices except Draft
+            query.status = { $ne: 'Draft' };
+        }
+
+        const count = await Invoice.countDocuments(query);
+        const invoices = await Invoice.find(query)
                                        .limit(limit)
-                                       .skip(limit * (page - 1));
+                                       .skip(limit * (page - 1))
+                                       .sort({ createdAt: -1 }); // Newest first
 
         res.json({
             invoices,
@@ -80,6 +95,7 @@ export const getInvoicesForProject = async (req, res) => {
             total: count
         });
     } catch (error) {
+        console.error('Error fetching invoices:', error);
         res.status(500).json({ message: 'Server Error' });
     }
 };
@@ -156,32 +172,118 @@ export const downloadInvoice = async (req, res) => {
 // @desc    Update an invoice
 // @route   PUT /api/invoices/:invoiceId
 export const updateInvoice = async (req, res) => {
-    const { lineItems, status } = req.body;
+    const { lineItems, status, paymentIntentId } = req.body;
     try {
-        const invoice = await Invoice.findById(req.params.invoiceId);
+        const invoice = await Invoice.findById(req.params.invoiceId)
+            .populate({
+                path: 'projectId',
+                populate: {
+                    path: 'workspaceId'
+                }
+            });
+            
         if (!invoice) {
             return res.status(404).json({ message: 'Invoice not found' });
         }
-        // --- SECURITY CHECK (Only creator can update) ---
-        if (invoice.freelancerId.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: 'User is not the creator of this invoice' });
-        }
-        // --- END SECURITY CHECK ---
+
+        const isFreelancer = invoice.freelancerId.toString() === req.user._id.toString();
         
-        // Business Rule: Only allow edits if status is 'Draft'
-        if (invoice.status !== 'Draft') {
-            return res.status(400).json({ message: 'Cannot edit an invoice that has already been sent or paid' });
+        // Check if user is the client (workspace owner or project member)
+        let isClient = false;
+        if (invoice.projectId && invoice.projectId.workspaceId) {
+            const workspace = invoice.projectId.workspaceId;
+            isClient = workspace.owner && workspace.owner.toString() === req.user._id.toString();
+        }
+        
+        // Also check if user is a member of the project
+        if (!isClient && invoice.projectId && invoice.projectId.members) {
+            isClient = invoice.projectId.members.some(
+                member => member.toString() === req.user._id.toString()
+            );
         }
 
-        if (lineItems) {
-            invoice.lineItems = lineItems;
-            invoice.totalAmount = lineItems.reduce((sum, item) => sum + item.amount, 0);
+        // --- SECURITY CHECKS ---
+        // Case 1: Freelancer updating their own invoice (Draft -> Sent or edit Draft)
+        if (isFreelancer && invoice.status === 'Draft') {
+            if (lineItems) {
+                invoice.lineItems = lineItems;
+                invoice.totalAmount = lineItems.reduce((sum, item) => sum + item.amount, 0);
+            }
+            if (status) invoice.status = status; // Allow changing to 'Sent'
         }
-        if (status) invoice.status = status; // e.g., to change to 'Sent'
+        // Case 2: Client marking invoice as paid (Sent -> Paid)
+        else if (isClient && invoice.status === 'Sent' && status === 'Paid') {
+            invoice.status = 'Paid';
+            if (paymentIntentId) {
+                invoice.paymentIntentId = paymentIntentId;
+            }
+        }
+        // Case 3: Unauthorized
+        else {
+            return res.status(403).json({ 
+                message: 'You are not authorized to update this invoice' 
+            });
+        }
+        // --- END SECURITY CHECKS ---
 
         const updatedInvoice = await invoice.save();
         res.json(updatedInvoice);
     } catch (error) {
+        console.error('Error updating invoice:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Delete an invoice
+// @route   DELETE /api/invoices/:invoiceId
+// @access  Private
+export const deleteInvoice = async (req, res) => {
+    try {
+        const invoice = await Invoice.findById(req.params.invoiceId)
+            .populate({
+                path: 'projectId',
+                populate: {
+                    path: 'workspaceId'
+                }
+            });
+
+        if (!invoice) {
+            return res.status(404).json({ message: 'Invoice not found' });
+        }
+
+        const isFreelancer = invoice.freelancerId.toString() === req.user._id.toString();
+        
+        // Check if user is the client
+        let isClient = false;
+        if (invoice.projectId && invoice.projectId.workspaceId) {
+            const workspace = invoice.projectId.workspaceId;
+            isClient = workspace.owner && workspace.owner.toString() === req.user._id.toString();
+        }
+        if (!isClient && invoice.projectId && invoice.projectId.members) {
+            isClient = invoice.projectId.members.some(
+                member => member.toString() === req.user._id.toString()
+            );
+        }
+
+        // --- DELETE PERMISSIONS ---
+        // Freelancers can delete their own Draft invoices
+        if (isFreelancer && invoice.status === 'Draft') {
+            await Invoice.findByIdAndDelete(req.params.invoiceId);
+            return res.json({ message: 'Invoice deleted successfully' });
+        }
+        // Clients can delete Paid invoices
+        else if (isClient && invoice.status === 'Paid') {
+            await Invoice.findByIdAndDelete(req.params.invoiceId);
+            return res.json({ message: 'Invoice deleted successfully' });
+        }
+        // Unauthorized
+        else {
+            return res.status(403).json({ 
+                message: 'You can only delete Draft invoices (freelancer) or Paid invoices (client)' 
+            });
+        }
+    } catch (error) {
+        console.error('Error deleting invoice:', error);
         res.status(500).json({ message: 'Server Error' });
     }
 };

@@ -7,10 +7,10 @@ import Invoice from '../models/Invoice.js';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // @desc    Create a stripe payment intent
-// @route   POST /api/payments/create-payment-intent
+// @route   POST /api/payments/create-intent
 // @access  Private
 export const createPaymentIntent = async (req, res) => {
-    const { invoiceId } = req.body;
+    const { invoiceId, amount } = req.body;
 
     try {
         const invoice = await Invoice.findById(invoiceId);
@@ -24,10 +24,10 @@ export const createPaymentIntent = async (req, res) => {
         }
 
         // Create a PaymentIntent with the order amount and currency
-        // Stripe expects the amount in the smallest currency unit (e.g., cents for USD/EUR)
+        // Amount should already be in cents from frontend
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(invoice.totalAmount * 100), // Convert to cents and round to avoid decimals
-            currency: 'usd', // IMPORTANT: Change to 'eur' or your currency
+            amount: amount, // Already in cents
+            currency: 'usd', // Change to 'eur' or your currency if needed
             metadata: { 
                 invoiceId: invoice._id.toString(),
                 projectId: invoice.projectId.toString()

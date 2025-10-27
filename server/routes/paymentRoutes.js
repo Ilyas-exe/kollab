@@ -6,7 +6,7 @@ import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/create-payment-intent', protect, createPaymentIntent);
+router.post('/create-intent', protect, createPaymentIntent);
 router.post('/stripe-webhook', stripeWebhook);
 
 export default router;
