@@ -41,6 +41,10 @@ function App() {
             path="/projects/:projectId" 
             element={<PrivateRoute><MainLayout><ProjectBoardPage /></MainLayout></PrivateRoute>} 
           />
+          <Route 
+            path="/projects/:projectId/invoices" 
+            element={<PrivateRoute><MainLayout><ProjectBoardPage initialTab="invoices" /></MainLayout></PrivateRoute>} 
+          />
         </Routes>
       </AuthProvider>
     </Router>

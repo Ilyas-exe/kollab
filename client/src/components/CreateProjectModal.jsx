@@ -5,26 +5,29 @@ import { useAuth } from '../context/AuthContext';
 
 function CreateProjectModal({ workspaceId, onClose, onProjectCreated }) {
   const [projectName, setProjectName] = useState('');
+  const [projectDescription, setProjectDescription] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // Add loading state
-  const { apiClient } = useAuth(); // Use the apiClient from context
+  const [loading, setLoading] = useState(false);
+  const { apiClient } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!projectName.trim()) {
-      setError('Project name cannot be empty.');
+      setError('Project name is required.');
       return;
     }
+    
     setError('');
     setLoading(true);
     
     try {
       const { data } = await apiClient.post('/projects', { 
-        name: projectName, 
+        name: projectName.trim(), 
+        description: projectDescription.trim() || undefined,
         workspaceId 
       });
-      onProjectCreated(data); // Pass the new project data back
-      onClose(); // Close the modal
+      onProjectCreated(data);
+      onClose();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create project. Please try again.');
       console.error(err);
@@ -34,59 +37,118 @@ function CreateProjectModal({ workspaceId, onClose, onProjectCreated }) {
   };
 
   return (
-    // Modal Backdrop - fixed position, covers screen, slight dark overlay
+    // Modal Backdrop with animation
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-      onClick={onClose} // Close modal if clicking outside
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 animate-fadeIn"
+      onClick={onClose}
     >
-      {/* Modal Content - stop propagation to prevent closing when clicking inside */}
+      {/* Modal Content with slide-up animation */}
       <div 
-        className="bg-surface rounded-lg shadow-xl p-6 w-full max-w-md"
+        className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 animate-slideUp"
         onClick={(e) => e.stopPropagation()} 
       >
-        <h2 className="text-2xl font-bold mb-4 text-text-primary">Create New Project</h2>
+        {/* Modal Header */}
+        <div className="px-6 py-5 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-text-primary">Create New Project</h2>
+                <p className="text-sm text-text-secondary">Add a new project to your workspace</p>
+              </div>
+            </div>
+            <button 
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+              disabled={loading}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Modal Body */}
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="projectName" className="block text-sm font-medium text-text-secondary mb-1">
-              Project Name
-            </label>
-            <input
-              type="text"
-              id="projectName"
-              value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
-              placeholder="e.g., Q3 Marketing Campaign"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-            />
+          <div className="px-6 py-5 space-y-5">
+            {/* Project Name Field */}
+            <div>
+              <label htmlFor="projectName" className="block text-sm font-semibold text-text-primary mb-2">
+                Project Name <span className="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                id="projectName"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                placeholder="e.g., Q4 Marketing Campaign"
+                required
+                autoFocus
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-text-primary placeholder-gray-400"
+              />
+            </div>
+
+            {/* Project Description Field */}
+            <div>
+              <label htmlFor="projectDescription" className="block text-sm font-semibold text-text-primary mb-2">
+                Description <span className="text-text-secondary text-xs font-normal">(Optional)</span>
+              </label>
+              <textarea
+                id="projectDescription"
+                value={projectDescription}
+                onChange={(e) => setProjectDescription(e.target.value)}
+                placeholder="Brief description of what this project is about..."
+                rows="3"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-text-primary placeholder-gray-400 resize-none"
+              />
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <svg className="w-5 h-5 text-danger flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <p className="text-sm text-danger font-medium">{error}</p>
+              </div>
+            )}
           </div>
 
-          {error && <p className="text-sm text-danger mb-4">{error}</p>}
-
-          <div className="flex justify-end gap-3 mt-6">
+          {/* Modal Footer */}
+          <div className="px-6 py-4 bg-gray-50 rounded-b-xl flex justify-end gap-3">
             <button 
               type="button" 
               onClick={onClose} 
               disabled={loading}
-              className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+              className="px-5 py-2.5 rounded-lg text-sm font-semibold text-text-secondary bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button 
               type="submit" 
               disabled={loading}
-              className="px-4 py-2 rounded-md text-sm font-medium text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 flex items-center"
+              className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 min-w-[140px] justify-center"
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Creating...
+                  <span>Creating...</span>
                 </>
               ) : (
-                'Create Project'
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>Create Project</span>
+                </>
               )}
             </button>
           </div>
