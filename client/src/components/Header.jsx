@@ -53,58 +53,70 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-surface shadow-sm border-b border-gray-200 sticky top-0 z-40">
-      <nav className="container mx-auto px-6 py-3 flex justify-between items-center">
-        <Link to="/dashboard" className="text-2xl font-bold text-primary hover:text-opacity-90 transition-colors">
-          Kollab
-        </Link>
-        
-        <div className="flex items-center space-x-6">
-          {/* Notification Bell */}
-          {user && (
-            <div className="relative" ref={notificationRef}>
-              <button
-                onClick={handleNotificationToggle}
-                className="relative p-2 text-text-secondary hover:text-primary hover:bg-gray-100 rounded-lg transition-all"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                
-                {/* Unread badge */}
-                {unreadCount > 0 && (
-                  <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-danger rounded-full">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
+    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex justify-between items-center">
+          {/* Logo */}
+          <Link to="/dashboard" className="flex items-center space-x-3 group">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
+              <span className="text-white font-black text-xl">K</span>
+            </div>
+            <span className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+              Kollab
+            </span>
+          </Link>
+          
+          <div className="flex items-center space-x-4">
+            {/* Notification Bell */}
+            {user && (
+              <div className="relative" ref={notificationRef}>
+                <button
+                  onClick={handleNotificationToggle}
+                  className="relative p-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  
+                  {/* Unread badge */}
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Notifications Dropdown */}
+                {showNotifications && (
+                  <Notifications onClose={() => setShowNotifications(false)} />
                 )}
-              </button>
-
-              {/* Notifications Dropdown */}
-              {showNotifications && (
-                <Notifications onClose={() => setShowNotifications(false)} />
-              )}
-            </div>
-          )}
-
-          {/* User info */}
-          {user && (
-            <div className="hidden md:flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-semibold">
-                {user.name.charAt(0).toUpperCase()}
               </div>
-              <span className="text-sm text-text-secondary">
-                <span className="font-medium text-text-primary">{user.name}</span>
-              </span>
-            </div>
-          )}
+            )}
 
-          {/* Logout button */}
-          <button 
-            onClick={logout} 
-            className="bg-danger text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-opacity-90 transition-all shadow-sm"
-          >
-            Logout
-          </button>
+            {/* User info */}
+            {user && (
+              <div className="hidden md:flex items-center space-x-3 px-3 py-2 bg-gray-50 rounded-xl">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-gray-900">{user.name}</span>
+                  <span className="text-xs text-gray-500">{user.role}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Logout button */}
+            <button 
+              onClick={logout} 
+              className="flex items-center space-x-2 px-4 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-all shadow-sm hover:shadow-md"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </nav>
     </header>

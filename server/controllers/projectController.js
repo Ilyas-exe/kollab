@@ -1,5 +1,6 @@
 import Project from '../models/Project.js';
 import Workspace from '../models/Workspace.js';
+import Task from '../models/Task.js';
 
 // @desc    Create a new project
 // @route   POST /api/projects
@@ -103,7 +104,7 @@ export const getMyAssignedProjects = async (req, res) => {
 // @desc    Update a project
 // @route   PUT /api/projects/:id
 export const updateProject = async (req, res) => {
-    const { name } = req.body;
+    const { name, description } = req.body;
     try {
         const project = await Project.findById(req.params.id).populate('workspaceId');
         if (!project) {
@@ -115,6 +116,9 @@ export const updateProject = async (req, res) => {
         }
         // --- END SECURITY CHECK ---
         project.name = name || project.name;
+        if (description !== undefined) {
+            project.description = description;
+        }
         const updatedProject = await project.save();
         res.json(updatedProject);
     } catch (error) {

@@ -56,9 +56,13 @@ const TaskCard = ({ task, index, onDelete, onUpdate, members = [] }) => {
       });
       if (response.ok) {
         const updatedTask = await response.json();
+        // Update task state immediately without page refresh
         onUpdate(updatedTask);
         setShowEditModal(false);
         setShowMenu(false);
+        // Update local state to reflect changes immediately
+        setEditTitle(updatedTask.title);
+        setEditAssignee(updatedTask.assigneeId?._id || '');
       }
     } catch (error) {
       console.error('Error updating task:', error);

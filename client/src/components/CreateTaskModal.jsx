@@ -41,26 +41,26 @@ function CreateTaskModal({ projectId, members, onClose, onTaskCreated }) {
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 animate-slideUp"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 animate-slideUp border border-gray-100"
         onClick={(e) => e.stopPropagation()} 
       >
         {/* Modal Header */}
-        <div className="px-6 py-5 border-b border-gray-200">
+        <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-text-primary">Create New Task</h2>
-                <p className="text-sm text-text-secondary">Add a task to your project board</p>
+                <h2 className="text-xl font-bold text-gray-900">Create New Task</h2>
+                <p className="text-sm text-gray-600">Add a task to your project board</p>
               </div>
             </div>
             <button 
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg p-1 transition-all"
               disabled={loading}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,8 +75,8 @@ function CreateTaskModal({ projectId, members, onClose, onTaskCreated }) {
           <div className="px-6 py-5 space-y-5">
             {/* Task Title Field */}
             <div>
-              <label htmlFor="taskTitle" className="block text-sm font-semibold text-text-primary mb-2">
-                Task Title <span className="text-danger">*</span>
+              <label htmlFor="taskTitle" className="block text-sm font-semibold text-gray-900 mb-2">
+                Task Title <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -86,20 +86,20 @@ function CreateTaskModal({ projectId, members, onClose, onTaskCreated }) {
                 placeholder="e.g., Design homepage mockup"
                 required
                 autoFocus
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-text-primary placeholder-gray-400"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-400 shadow-sm"
               />
             </div>
 
             {/* Assignee Field */}
             <div>
-              <label htmlFor="assignee" className="block text-sm font-semibold text-text-primary mb-2">
-                Assign To <span className="text-text-secondary text-xs font-normal">(Optional)</span>
+              <label htmlFor="assignee" className="block text-sm font-semibold text-gray-900 mb-2">
+                Assign To <span className="text-gray-500 text-xs font-normal">(Optional)</span>
               </label>
               <select
                 id="assignee"
                 value={assigneeId}
                 onChange={(e) => setAssigneeId(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-text-primary bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 bg-white shadow-sm"
               >
                 <option value="">Unassigned</option>
                 {members && members.map(member => (
@@ -109,7 +109,7 @@ function CreateTaskModal({ projectId, members, onClose, onTaskCreated }) {
                 ))}
               </select>
               {members && members.length === 0 && (
-                <p className="text-xs text-text-secondary mt-2">
+                <p className="text-xs text-gray-600 mt-2">
                   No team members available. Invite members to assign tasks.
                 </p>
               )}
@@ -117,29 +117,29 @@ function CreateTaskModal({ projectId, members, onClose, onTaskCreated }) {
 
             {/* Error Message */}
             {error && (
-              <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <svg className="w-5 h-5 text-danger flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-xl">
+                <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
-                <p className="text-sm text-danger font-medium">{error}</p>
+                <p className="text-sm text-red-600 font-medium">{error}</p>
               </div>
             )}
           </div>
 
           {/* Modal Footer */}
-          <div className="px-6 py-4 bg-gray-50 rounded-b-xl flex justify-end gap-3">
+          <div className="px-6 py-4 bg-gray-50 rounded-b-2xl flex justify-end gap-3 border-t border-gray-100">
             <button 
               type="button" 
               onClick={onClose} 
               disabled={loading}
-              className="px-5 py-2.5 rounded-lg text-sm font-semibold text-text-secondary bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button 
               type="submit" 
               disabled={loading}
-              className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 min-w-[120px] justify-center"
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 min-w-[120px] justify-center"
             >
               {loading ? (
                 <>

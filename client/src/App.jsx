@@ -7,6 +7,7 @@ import { AuthProvider } from './context/AuthContext';
 import MainLayout from './layouts/MainLayout';
 
 // Pages
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
@@ -22,8 +23,8 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          {/* Public Routes have no layout */}
-          <Route path="/" element={<Navigate to="/login" />} />
+          {/* Public Routes - Landing page first */}
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/accept-invitation" element={<AcceptInvitationPage />} />

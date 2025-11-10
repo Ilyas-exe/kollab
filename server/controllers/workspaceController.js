@@ -1,6 +1,7 @@
 // Fichier: /server/controllers/workspaceController.js
 
 import Workspace from '../models/Workspace.js';
+import Project from '../models/Project.js';
 import Task from '../models/Task.js';
 
 // @desc    Get workspaces for a logged-in user
