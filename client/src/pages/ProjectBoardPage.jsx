@@ -20,7 +20,7 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const [isChatOpen, setIsChatOpen] = useState(false);
 
-    const isClient = user?.role === 'client';
+    const isClient = user?.role === 'Client';
 
     const fetchProjectData = async () => {
         try {
@@ -163,6 +163,18 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
                             </div>
 
                             {/* Action Buttons */}
+                            {isClient && (
+                                <button
+                                    onClick={() => setIsInviteModalOpen(true)}
+                                    className="inline-flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                    </svg>
+                                    <span>Invite Freelancer</span>
+                                </button>
+                            )}
+
                             <button
                                 onClick={() => setIsChatOpen(true)}
                                 className="inline-flex items-center space-x-2 px-4 py-2.5 border border-gray-300 text-gray-700 bg-white rounded-xl font-medium hover:bg-gray-50 transition-all shadow-sm"
@@ -172,22 +184,10 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
                                 </svg>
                                 <span>Chat</span>
                             </button>
-
-                            {isClient && (
-                                <button
-                                    onClick={() => setIsInviteModalOpen(true)}
-                                    className="inline-flex items-center space-x-2 px-4 py-2.5 border border-gray-300 text-gray-700 bg-white rounded-xl font-medium hover:bg-gray-50 transition-all shadow-sm"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                    </svg>
-                                    <span>Invite</span>
-                                </button>
-                            )}
                             
                             <button
                                 onClick={() => setIsTaskModalOpen(true)}
-                                className="inline-flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md"
+                                className="inline-flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

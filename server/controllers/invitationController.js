@@ -71,28 +71,75 @@ const acceptInvitation = async (req, res) => {
         if (!project) {
             return res.status(404).json({ success: false, message: 'The project associated with this invitation no longer exists.' });
         }
-        const newUser = new User({
-            name,
-            email: invitation.email,
-            password,
-            role: 'Freelancer'
-        });
-        await newUser.save();
-        project.members.addToSet(newUser._id);
-        await project.save();
-        await Workspace.findByIdAndUpdate(project.workspaceId, {
-            $addToSet: { members: newUser._id }
-        });
-        invitation.status = 'Accepted';
-        await invitation.save();
 
-        // --- AJOUT DE LA NOTIFICATION ---
-        const text = `"${newUser.name}" has accepted your invitation to join the project "${project.name}".`;
-        const link = `/projects/${project._id}`;
-        await createNotification(invitation.inviterId, text, link);
-        // --- FIN DE L'AJOUT ---
+        // Check if user already exists
+        let existingUser = await User.findOne({ email: invitation.email });
+        let userId;
+        let userName;
 
-        res.status(201).json({ success: true, message: 'Account created and invitation accepted.' });
+        if (existingUser) {
+            // User already exists - just add them to the project
+            userId = existingUser._id;
+            userName = existingUser.name;
+            
+            // Add to project members
+            project.members.addToSet(userId);
+            await project.save();
+            
+            // Add to workspace members
+            await Workspace.findByIdAndUpdate(project.workspaceId, {
+                $addToSet: { members: userId }
+            });
+            
+            invitation.status = 'Accepted';
+            await invitation.save();
+
+            // Send notification
+            const text = `"${userName}" has accepted your invitation to join the project "${project.name}".`;
+            const link = `/projects/${project._id}`;
+            await createNotification(invitation.inviterId, text, link);
+
+            return res.status(200).json({ 
+                success: true, 
+                message: 'You have been added to the project. Please log in with your existing account.',
+                userExists: true 
+            });
+        } else {
+            // User doesn't exist - create new account
+            const newUser = new User({
+                name,
+                email: invitation.email,
+                password,
+                role: 'Freelancer'
+            });
+            await newUser.save();
+            
+            userId = newUser._id;
+            userName = newUser.name;
+            
+            // Add to project members
+            project.members.addToSet(userId);
+            await project.save();
+            
+            // Add to workspace members
+            await Workspace.findByIdAndUpdate(project.workspaceId, {
+                $addToSet: { members: userId }
+            });
+            
+            invitation.status = 'Accepted';
+            await invitation.save();
+
+            // Send notification
+            const text = `"${userName}" has accepted your invitation to join the project "${project.name}".`;
+            const link = `/projects/${project._id}`;
+            await createNotification(invitation.inviterId, text, link);
+
+            return res.status(201).json({ 
+                success: true, 
+                message: 'Account created and invitation accepted.',
+                userExists: false 
+            });
+        }
 
     } catch (error) {
         console.error("Error accepting invitation:", error);

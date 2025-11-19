@@ -51,13 +51,22 @@ const AcceptInvitationPage = () => {
     setLoading(true);
 
     try {
-      await apiClient.post('/invitations/accept', { token, name, password });
-      // On success, redirect to the login page with a success message
-      navigate('/login', {
-        state: { message: 'Account created successfully! You can now log in.' }
-      });
+      const { data } = await apiClient.post('/invitations/accept', { token, name, password });
+      
+      // Check if user already exists
+      if (data.userExists) {
+        // Existing user - redirect to login with message
+        navigate('/login', {
+          state: { message: 'You have been added to the project! Please log in with your existing account.' }
+        });
+      } else {
+        // New user - redirect to login with account created message
+        navigate('/login', {
+          state: { message: 'Account created successfully! You can now log in.' }
+        });
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create account. Please try again.');
+      setError(err.response?.data?.message || 'Failed to accept invitation. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -99,26 +108,32 @@ const AcceptInvitationPage = () => {
             />
           </div>
 
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-800">
+              <strong>Note:</strong> If you already have an account with this email, click accept below and then log in with your existing credentials. Otherwise, create your account details below.
+            </p>
+          </div>
+
           <div>
-            <label htmlFor="name" className="text-sm font-medium text-text-secondary block mb-2">Full Name</label>
+            <label htmlFor="name" className="text-sm font-medium text-text-secondary block mb-2">Full Name (for new accounts)</label>
             <input 
               id="name" 
               type="text" 
               value={name} 
               onChange={(e) => setName(e.target.value)} 
-              required 
+              placeholder="Leave empty if you already have an account"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" 
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="text-sm font-medium text-text-secondary block mb-2">Create a Password</label>
+            <label htmlFor="password" className="text-sm font-medium text-text-secondary block mb-2">Password (for new accounts)</label>
             <input 
               id="password" 
               type="password" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
-              required 
+              placeholder="Leave empty if you already have an account"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" 
             />
           </div>
@@ -129,7 +144,7 @@ const AcceptInvitationPage = () => {
               disabled={loading}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
             >
-              {loading ? 'Creating Account...' : 'Accept Invitation & Create Account'}
+              {loading ? 'Processing...' : 'Accept Invitation'}
             </button>
           </div>
         </form>
