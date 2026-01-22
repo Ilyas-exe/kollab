@@ -4,13 +4,22 @@ import Stripe from 'stripe';
 import Invoice from '../models/Invoice.js';
 
 // Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+let stripe;
+if (process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+} else {
+    console.warn("Stripe API key not found. Stripe integration is disabled.");
+}
 
 // @desc    Create a stripe payment intent
 // @route   POST /api/payments/create-intent
 // @access  Private
 export const createPaymentIntent = async (req, res) => {
     const { invoiceId, amount } = req.body;
+
+    if (!stripe) {
+        return res.status(503).json({ message: "Stripe is disabled because the API key is missing." });
+    }
 
     try {
         const invoice = await Invoice.findById(invoiceId);
@@ -52,6 +61,10 @@ export const createPaymentIntent = async (req, res) => {
 // @route   POST /api/payments/stripe-webhook
 // @access  Public
 export const stripeWebhook = async (req, res) => {
+  if (!stripe) {
+     return res.status(503).send("Stripe is disabled.");
+  }
+
   const sig = req.headers['stripe-signature'];
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
   let event;
