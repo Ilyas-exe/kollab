@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
   // Fetch user profile when the app loads if token exists
   useEffect(() => {
     const fetchUserProfile = async () => {
-      console.log('🔍 Checking auth - Token:', token ? 'exists' : 'none', 'User:', user ? user.name : 'none');
+      console.log('🔍 Checking auth - Token:', token ? 'exists' : 'none');
       
       if (token) {
         try {

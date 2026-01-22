@@ -1,6 +1,6 @@
 // src/pages/WorkspaceDetailPage.jsx
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import CreateProjectModal from '../components/CreateProjectModal';
@@ -15,7 +15,7 @@ const WorkspaceDetailPage = () => {
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
       const { data } = await apiClient.get(`/workspaces/${workspaceId}/projects`);
@@ -25,11 +25,11 @@ const WorkspaceDetailPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiClient, workspaceId]);
 
   useEffect(() => {
     fetchProjects();
-  }, [workspaceId, apiClient]);
+  }, [fetchProjects]);
 
   const handleProjectCreated = (newProject) => {
     setProjects(prev => [newProject, ...prev]);

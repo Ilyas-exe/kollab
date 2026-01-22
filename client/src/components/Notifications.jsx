@@ -1,5 +1,5 @@
 // Fichier: /client/src/components/Notifications.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 
@@ -8,7 +8,7 @@ const Notifications = ({ onClose }) => {
   const [loading, setLoading] = useState(true);
   const { apiClient } = useAuth();
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       setLoading(true);
       const { data } = await apiClient.get('/notifications');
@@ -18,11 +18,11 @@ const Notifications = ({ onClose }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiClient]);
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
+  }, [fetchNotifications]);
 
   const handleMarkAsRead = async (notificationId) => {
     try {

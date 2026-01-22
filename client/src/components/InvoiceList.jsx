@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import CreateInvoiceModal from './CreateInvoiceModal';
 import PaymentModal from './PaymentModal';
@@ -15,11 +15,7 @@ const InvoiceList = ({ projectId, projectName }) => {
 
   const isFreelancer = user?.role === 'Freelancer';
 
-  useEffect(() => {
-    fetchInvoices();
-  }, [projectId]);
-
-  const fetchInvoices = async () => {
+  const fetchInvoices = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiClient.get(`/projects/${projectId}/invoices`);
@@ -29,7 +25,11 @@ const InvoiceList = ({ projectId, projectName }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiClient, projectId]);
+
+  useEffect(() => {
+    fetchInvoices();
+  }, [fetchInvoices]);
 
   const handleInvoiceCreated = (newInvoice) => {
     setInvoices([newInvoice, ...invoices]);

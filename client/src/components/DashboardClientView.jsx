@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 
@@ -15,15 +15,15 @@ const DashboardClientView = () => {
   });
   const { apiClient, user } = useAuth();
 
-  const fetchWorkspaces = async () => {
+  const fetchWorkspaces = useCallback(async () => {
     const { data } = await apiClient.get('/workspaces');
     setWorkspaces(data);
-    
+
     // Calculate stats
     let totalProjects = 0;
     let activeProjects = 0;
     const uniqueMembers = new Set();
-    
+
     for (const ws of data) {
       // Fetch projects for each workspace to get accurate counts
       try {
@@ -31,7 +31,7 @@ const DashboardClientView = () => {
         const projects = projectsRes.data.projects || [];
         ws.projectCount = projects.length; // Store project count in workspace object
         totalProjects += projects.length;
-        
+
         // Check for active projects (projects with tasks in "In Progress")
         for (const project of projects) {
           const tasksRes = await apiClient.get(`/projects/${project._id}/tasks`);
@@ -45,21 +45,21 @@ const DashboardClientView = () => {
         console.error(`Error fetching projects for workspace ${ws._id}:`, error);
         ws.projectCount = 0;
       }
-      
+
       // Count unique members across all workspaces
       ws.members?.forEach(member => uniqueMembers.add(member._id || member));
     }
-    
+
     setStats({
       totalProjects,
       activeProjects,
       totalMembers: uniqueMembers.size
     });
-  };
+  }, [apiClient]);
 
   useEffect(() => {
     fetchWorkspaces();
-  }, []);
+  }, [fetchWorkspaces]);
 
   const handleCreateWorkspace = async (e) => {
     e.preventDefault();

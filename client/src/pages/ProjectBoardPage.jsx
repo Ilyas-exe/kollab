@@ -1,6 +1,6 @@
 // src/pages/ProjectBoardPage.jsx
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import KanbanBoard from '../components/KanbanBoard';
@@ -22,7 +22,7 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
 
     const isClient = user?.role === 'Client';
 
-    const fetchProjectData = async () => {
+    const fetchProjectData = useCallback(async () => {
         try {
             setLoading(true);
             const [projectRes, tasksRes] = await Promise.all([
@@ -37,11 +37,11 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [apiClient, projectId]);
 
     useEffect(() => {
         fetchProjectData();
-    }, [projectId]);
+    }, [fetchProjectData]);
 
     const handleTaskCreated = (newTask) => {
         setTasks(prev => [newTask, ...prev]);
