@@ -35,7 +35,7 @@ const AcceptInvitationPage = () => {
         } else {
           setError(data.message);
         }
-      } catch (_error) {
+      } catch {
         setError('Invalid or expired invitation link.');
       } finally {
         setLoading(false);

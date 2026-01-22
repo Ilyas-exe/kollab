@@ -15,7 +15,8 @@ The Pages workflow deploys the Vite client to:
 1. Go to **Settings → Pages**.
 2. **Source**: select **Deploy from a branch**.
 3. **Branch**: choose **gh-pages** and **/(root)**, then save.
-4. Ensure Actions are enabled for the repository.
+4. Go to **Settings → Actions → General** and set **Workflow permissions** to **Read and write permissions**.
+5. Ensure Actions are enabled for the repository.
 
 ### Notes
 - Deploys trigger on **push** to `dev` or `master` (including merge from `dev` to `master`).
