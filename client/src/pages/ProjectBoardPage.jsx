@@ -146,7 +146,7 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
                         <div className="flex items-center space-x-3">
                             {/* Team Members Avatar Group */}
                             <div className="flex items-center -space-x-2">
-                                {project.members?.slice(0, 5).map((member, idx) => (
+                                {project.members?.slice(0, 5).map((member) => (
                                     <div 
                                         key={member._id}
                                         className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-sm font-bold border-2 border-white shadow-md"

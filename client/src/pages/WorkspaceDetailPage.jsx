@@ -7,7 +7,6 @@ import CreateProjectModal from '../components/CreateProjectModal';
 
 const WorkspaceDetailPage = () => {
   const [projects, setProjects] = useState([]);
-  const [workspaceName, setWorkspaceName] = useState('');
   const [loading, setLoading] = useState(true);
   const { workspaceId } = useParams();
   const { apiClient } = useAuth();
