@@ -35,6 +35,7 @@ export const loginUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role, // <-- LA LIGNE MAGIQUE À AJOUTER
       token: generateToken(user._id),
     });
   } else {

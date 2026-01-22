@@ -17,6 +17,7 @@ const apiClient = axios.create({
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +29,30 @@ export const AuthProvider = ({ children }) => {
       delete apiClient.defaults.headers.common['Authorization'];
       localStorage.removeItem('token');
     }
+  }, [token]);
+
+  // Fetch user profile when the app loads if token exists
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      console.log('🔍 Checking auth - Token:', token ? 'exists' : 'none');
+      
+      if (token) {
+        try {
+          console.log('📡 Fetching user profile...');
+          const { data } = await apiClient.get('/users/profile');
+          console.log('✅ User profile fetched:', data);
+          setUser(data);
+        } catch (error) {
+          console.error('❌ Failed to fetch user profile:', error);
+          // If token is invalid, clear it
+          setToken(null);
+        }
+      }
+      setLoading(false);
+      console.log('✅ Loading complete');
+    };
+
+    fetchUserProfile();
   }, [token]);
 
   const login = async (email, password) => {
@@ -51,7 +76,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, register, logout, apiClient }}>
+    <AuthContext.Provider value={{ token, user, loading, login, register, logout, apiClient }}>
       {children}
     </AuthContext.Provider>
   );
