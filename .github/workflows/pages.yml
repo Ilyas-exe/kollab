@@ -46,6 +46,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: client/dist
+          keep_files: true
 
       - name: Deploy to GitHub Pages (dev)
         if: github.ref == 'refs/heads/dev'
@@ -54,3 +55,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: client/dist
           destination_dir: dev
+          keep_files: true
