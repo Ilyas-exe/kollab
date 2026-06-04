@@ -14,6 +14,8 @@ import DashboardPage from './pages/DashboardPage';
 import WorkspaceDetailPage from './pages/WorkspaceDetailPage';
 import ProjectBoardPage from './pages/ProjectBoardPage';
 import AcceptInvitationPage from './pages/AcceptInvitationPage';
+import InvoiceDetailPage from './pages/InvoiceDetailPage';
+import ProfileSettingsPage from './pages/ProfileSettingsPage';
 
 // Components
 import PrivateRoute from './components/PrivateRoute';
@@ -45,6 +47,14 @@ function App() {
           <Route 
             path="/projects/:projectId/invoices" 
             element={<PrivateRoute><MainLayout><ProjectBoardPage initialTab="invoices" /></MainLayout></PrivateRoute>} 
+          />
+          <Route
+            path="/invoices"
+            element={<PrivateRoute><MainLayout><InvoiceDetailPage /></MainLayout></PrivateRoute>}
+          />
+          <Route
+            path="/settings"
+            element={<PrivateRoute><MainLayout><ProfileSettingsPage /></MainLayout></PrivateRoute>}
           />
         </Routes>
       </AuthProvider>

@@ -74,15 +74,15 @@ const AcceptInvitationPage = () => {
 
   const renderContent = () => {
     if (loading) {
-      return <p className="text-center text-text-secondary">Verifying invitation...</p>;
+      return <p className="text-center text-muted">Verifying invitation...</p>;
     }
 
     if (error || !invitation) {
       return (
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-danger mb-4">Invitation Error</h2>
-          <p className="text-text-secondary">{error}</p>
-          <Link to="/login" className="mt-4 inline-block text-primary hover:underline">Go to Login</Link>
+          <h2 className="text-2xl font-semibold text-danger mb-3">Invitation Error</h2>
+          <p className="text-sm text-muted">{error}</p>
+          <Link to="/login" className="mt-4 inline-block text-sm font-semibold text-ink hover:text-accent">Go to Login</Link>
         </div>
       );
     }
@@ -90,51 +90,51 @@ const AcceptInvitationPage = () => {
     return (
       <>
         <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold text-text-primary">Join Project on Kollab</h2>
-            <p className="text-text-secondary mt-2">
-                You've been invited to join the project: <span className="font-bold text-primary">{invitation.project.name}</span>
-            </p>
+          <h2 className="text-2xl font-semibold text-ink">Join project</h2>
+          <p className="text-sm text-muted mt-2">
+            You've been invited to join: <span className="font-semibold text-ink">{invitation.project.name}</span>
+          </p>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="text-sm font-medium text-text-secondary block mb-2">Email Address</label>
+            <label htmlFor="email" className="label mb-2 block">Email Address</label>
             <input 
               id="email" 
               type="email" 
               value={invitation.email} 
               readOnly 
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500" 
+              className="input bg-paper text-muted" 
             />
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
-              <strong>Note:</strong> If you already have an account with this email, click accept below and then log in with your existing credentials. Otherwise, create your account details below.
+          <div className="border border-line bg-paper p-4">
+            <p className="text-sm text-muted">
+              <strong className="text-ink">Note:</strong> If you already have an account with this email, click accept below and then log in with your existing credentials. Otherwise, create your account details below.
             </p>
           </div>
 
           <div>
-            <label htmlFor="name" className="text-sm font-medium text-text-secondary block mb-2">Full Name (for new accounts)</label>
+            <label htmlFor="name" className="label mb-2 block">Full Name (for new accounts)</label>
             <input 
               id="name" 
               type="text" 
               value={name} 
               onChange={(e) => setName(e.target.value)} 
               placeholder="Leave empty if you already have an account"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" 
+              className="input" 
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="text-sm font-medium text-text-secondary block mb-2">Password (for new accounts)</label>
+            <label htmlFor="password" className="label mb-2 block">Password (for new accounts)</label>
             <input 
               id="password" 
               type="password" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
               placeholder="Leave empty if you already have an account"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" 
+              className="input" 
             />
           </div>
 
@@ -142,7 +142,7 @@ const AcceptInvitationPage = () => {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
+              className="btn btn-primary w-full"
             >
               {loading ? 'Processing...' : 'Accept Invitation'}
             </button>
@@ -153,8 +153,8 @@ const AcceptInvitationPage = () => {
   };
   
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <div className="w-full max-w-md p-8 bg-surface rounded-lg shadow-md">
+    <div className="app-shell flex items-center justify-center px-6 py-16">
+      <div className="w-full max-w-md card-strong p-8">
         {renderContent()}
       </div>
     </div>

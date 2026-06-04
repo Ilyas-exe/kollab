@@ -87,13 +87,14 @@ const TaskCard = ({ task, index, onDelete, onUpdate, members = [] }) => {
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            className={`bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all ${
-              snapshot.isDragging ? 'shadow-lg ring-2 ring-primary ring-opacity-50 rotate-2' : ''
+            className={`card-strong p-4 rounded-2xl shadow-sm border ${'border-line'} transition-all ${
+              snapshot.isDragging ? 'shadow-lg ring-2 ring-accent/40' : ''
             }`}
+            style={{ borderRadius: 16 }}
           >
             {/* Header with Title and Menu */}
             <div className="flex items-start justify-between mb-3">
-              <p className="font-semibold text-text-primary leading-snug flex-1 pr-2">
+              <p className="font-semibold text-ink leading-snug flex-1 pr-2">
                 {task.title}
               </p>
               
@@ -105,7 +106,7 @@ const TaskCard = ({ task, index, onDelete, onUpdate, members = [] }) => {
                     setShowMenu(!showMenu);
                   }}
                   onMouseDown={(e) => e.stopPropagation()}
-                  className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 transition-colors"
+                  className="text-muted hover:text-ink p-1 rounded-full hover:bg-paper transition-colors"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
@@ -114,13 +115,13 @@ const TaskCard = ({ task, index, onDelete, onUpdate, members = [] }) => {
 
                 {/* Dropdown Menu */}
                 {showMenu && (
-                  <div className="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                  <div className="absolute right-0 mt-1 w-44 bg-paper rounded-lg shadow-lg border ${'border-line'} py-1 z-50">
                     <button
                       onClick={() => {
                         setShowEditModal(true);
                         setShowMenu(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                      className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-paper/60 flex items-center space-x-2"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -146,21 +147,21 @@ const TaskCard = ({ task, index, onDelete, onUpdate, members = [] }) => {
               {/* Assignee */}
               {assigneeName ? (
                 <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-semibold">
+                  <div className="w-6 h-6 rounded-full bg-accent text-white flex items-center justify-center text-xs font-semibold">
                     {assigneeName.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-xs text-text-secondary font-medium">
+                  <span className="text-xs text-muted font-medium">
                     {assigneeName}
                   </span>
                 </div>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-6 h-6 rounded-full bg-paper flex items-center justify-center">
+                    <svg className="w-3 h-3 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   </div>
-                  <span className="text-xs text-text-secondary">Unassigned</span>
+                  <span className="text-xs text-muted">Unassigned</span>
                 </div>
               )}
             </div>

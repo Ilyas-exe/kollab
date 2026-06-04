@@ -35,7 +35,7 @@ const KanbanBoard = ({ tasks, onDragEnd, onDeleteTask, onUpdateTask, members = [
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex space-x-6 overflow-x-auto pb-4">
+      <div className="flex gap-6 overflow-x-auto pb-4 px-1">
         {Object.entries(columns).map(([title, { tasks, color, icon }]) => (
           <KanbanColumn 
             key={title} 

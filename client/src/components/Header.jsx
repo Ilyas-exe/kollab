@@ -53,26 +53,31 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <header className="bg-white/6 backdrop-blur-sm sticky top-0 z-40 border-b border-white/10">
+      <nav className="page-wrap py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link to="/dashboard" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
-              <span className="text-white font-black text-xl">K</span>
+          <Link to="/dashboard" className="flex items-center gap-3">
+            <div className="h-10 w-10 bg-accent text-white flex items-center justify-center text-sm font-semibold rounded-md shadow-sm">
+              <span className="text-sm font-semibold">K</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-              Kollab
-            </span>
+            <span className="text-lg font-semibold text-ink tracking-tight">Kollab</span>
           </Link>
+          {/* Simple top navigation */}
+          <div className="hidden md:flex items-center gap-4 ml-6">
+            <Link to="/dashboard" className="text-sm text-gray-600 hover:text-ink">Tableau</Link>
+            <Link to="/invoices" className="text-sm text-gray-600 hover:text-ink">Factures</Link>
+            <Link to="/projects" className="text-sm text-gray-600 hover:text-ink">Projets</Link>
+            <Link to="/settings" className="text-sm text-gray-600 hover:text-ink">Paramètres</Link>
+          </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-3">
             {/* Notification Bell */}
             {user && (
               <div className="relative" ref={notificationRef}>
                 <button
                   onClick={handleNotificationToggle}
-                  className="relative p-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                  className="relative p-2 border border-line text-muted hover:text-ink hover:bg-paper transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -80,7 +85,7 @@ const Header = () => {
                   
                   {/* Unread badge */}
                   {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-semibold text-white bg-danger border border-danger">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
@@ -95,22 +100,19 @@ const Header = () => {
 
             {/* User info */}
             {user && (
-              <div className="hidden md:flex items-center space-x-3 px-3 py-2 bg-gray-50 rounded-xl">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+              <div className="hidden md:flex items-center gap-3 px-3 py-2 bg-white/6 border border-white/10 rounded-full">
+                <div className="h-9 w-9 bg-surface text-ink flex items-center justify-center text-sm font-semibold rounded-full">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-gray-900">{user.name}</span>
-                  <span className="text-xs text-gray-500">{user.role}</span>
+                  <span className="text-sm font-semibold text-ink">{user.name}</span>
+                  <span className="text-xs text-muted">{user.role}</span>
                 </div>
               </div>
             )}
 
             {/* Logout button */}
-            <button 
-              onClick={logout} 
-              className="flex items-center space-x-2 px-4 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-all shadow-sm hover:shadow-md"
-            >
+            <button onClick={logout} className="px-3 py-2 text-sm text-rose-600 border border-rose-100 rounded-md flex items-center gap-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>

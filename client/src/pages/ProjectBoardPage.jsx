@@ -84,10 +84,10 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+            <div className="flex items-center justify-center min-h-screen bg-paper">
                 <div className="text-center">
-                    <div className="inline-block animate-spin h-16 w-16 border-4 border-blue-600 border-t-transparent rounded-full"></div>
-                    <p className="mt-4 text-gray-600 font-medium">Loading project board...</p>
+                    <div className="inline-block animate-spin h-14 w-14 border-4 border-accent border-t-transparent rounded-full"></div>
+                    <p className="mt-4 text-muted font-medium">Loading project board...</p>
                 </div>
             </div>
         );
@@ -95,9 +95,9 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
 
     if (!project) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+            <div className="flex items-center justify-center min-h-screen bg-paper">
                 <div className="text-center">
-                    <p className="text-gray-600 font-medium">Project not found</p>
+                    <p className="text-muted font-medium">Project not found</p>
                 </div>
             </div>
         );
@@ -114,16 +114,16 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
     const backPath = isClient ? `/workspaces/${project.workspaceId}` : '/dashboard';
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div className="min-h-screen bg-paper">
             {/* Project Header */}
-            <div className="bg-white border-b border-gray-200 shadow-sm">
+            <div className="card">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             {/* Back Button */}
                             <Link 
                                 to={backPath}
-                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                                className="p-2 text-muted hover:text-accent hover:bg-paper rounded-md transition-all"
                             >
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -132,13 +132,13 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
                             
                             <div>
                                 <div className="flex items-center space-x-3">
-                                    <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
-                                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                    <h1 className="text-3xl font-semibold text-ink">{project.name}</h1>
+                                    <span className="px-3 py-1 bg-accent/10 text-accent text-xs font-semibold rounded-full">
                                         {taskStats.total} {taskStats.total === 1 ? 'Task' : 'Tasks'}
                                     </span>
                                 </div>
                                 {project.description && (
-                                    <p className="text-gray-600 text-sm mt-1">{project.description}</p>
+                                    <p className="text-muted text-sm mt-1">{project.description}</p>
                                 )}
                             </div>
                         </div>
@@ -149,14 +149,14 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
                                 {project.members?.slice(0, 5).map((member) => (
                                     <div 
                                         key={member._id}
-                                        className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-sm font-bold border-2 border-white shadow-md"
+                                        className="w-10 h-10 rounded-full bg-accent/20 text-accent flex items-center justify-center text-sm font-semibold border-2 border-paper shadow-sm"
                                         title={member.name}
                                     >
                                         {member.name.charAt(0).toUpperCase()}
                                     </div>
                                 ))}
                                 {project.members?.length > 5 && (
-                                    <div className="w-10 h-10 rounded-full bg-gray-300 text-gray-700 flex items-center justify-center text-sm font-bold border-2 border-white shadow-md">
+                                    <div className="w-10 h-10 rounded-full bg-paper text-muted flex items-center justify-center text-sm font-bold border-2 border-paper shadow-sm">
                                         +{project.members.length - 5}
                                     </div>
                                 )}
@@ -166,18 +166,18 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
                             {isClient && (
                                 <button
                                     onClick={() => setIsInviteModalOpen(true)}
-                                    className="inline-flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg"
+                                    className="btn btn-ghost"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                                     </svg>
-                                    <span>Invite Freelancer</span>
+                                    <span>Invite</span>
                                 </button>
                             )}
 
                             <button
                                 onClick={() => setIsChatOpen(true)}
-                                className="inline-flex items-center space-x-2 px-4 py-2.5 border border-gray-300 text-gray-700 bg-white rounded-xl font-medium hover:bg-gray-50 transition-all shadow-sm"
+                                className="btn btn-ghost"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -187,7 +187,7 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
                             
                             <button
                                 onClick={() => setIsTaskModalOpen(true)}
-                                className="inline-flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
+                                className="btn btn-primary"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -198,28 +198,28 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
                     </div>
 
                     {/* Task Statistics */}
-                    <div className="flex items-center space-x-6 mt-6">
+                    <div className="flex items-center space-x-6 mt-6 text-muted">
                         <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-                            <span className="text-sm text-gray-600">
-                                <span className="font-semibold text-gray-900">{taskStats.todo}</span> To Do
+                            <div className="w-3 h-3 rounded-full bg-line"></div>
+                            <span className="text-sm">
+                                <span className="font-semibold text-ink">{taskStats.todo}</span> To Do
                             </span>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                            <span className="text-sm text-gray-600">
-                                <span className="font-semibold text-gray-900">{taskStats.inProgress}</span> In Progress
+                            <div className="w-3 h-3 rounded-full bg-accent"></div>
+                            <span className="text-sm">
+                                <span className="font-semibold text-ink">{taskStats.inProgress}</span> In Progress
                             </span>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                            <span className="text-sm text-gray-600">
-                                <span className="font-semibold text-gray-900">{taskStats.done}</span> Done
+                            <div className="w-3 h-3 rounded-full bg-accent-2"></div>
+                            <span className="text-sm">
+                                <span className="font-semibold text-ink">{taskStats.done}</span> Done
                             </span>
                         </div>
-                        <div className="h-4 w-px bg-gray-300"></div>
-                        <div className="text-sm text-gray-600">
-                            Progress: <span className="font-semibold text-gray-900">
+                        <div className="h-4 w-px bg-line"></div>
+                        <div className="text-sm">
+                            Progress: <span className="font-semibold text-ink">
                                 {taskStats.total > 0 ? Math.round((taskStats.done / taskStats.total) * 100) : 0}%
                             </span>
                         </div>
@@ -228,15 +228,15 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
             </div>
 
             {/* Tab Navigation */}
-            <div className="border-b border-gray-200 bg-white shadow-sm">
+            <div className="card">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex space-x-8">
                         <button
                             onClick={() => setActiveTab('board')}
                             className={`py-4 px-2 border-b-2 font-semibold text-sm transition-colors ${
                                 activeTab === 'board'
-                                    ? 'border-blue-600 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-accent text-accent'
+                                    : 'border-transparent text-muted hover:text-ink hover:border-line'
                             }`}
                         >
                             <div className="flex items-center space-x-2">
@@ -244,7 +244,7 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
                                 </svg>
                                 <span>Board</span>
-                                <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
+                                <span className="ml-2 px-2 py-0.5 bg-paper text-muted rounded-full text-xs font-bold">
                                     {taskStats.total}
                                 </span>
                             </div>
@@ -253,8 +253,8 @@ const ProjectBoardPage = ({ initialTab = 'board' }) => {
                             onClick={() => setActiveTab('invoices')}
                             className={`py-4 px-2 border-b-2 font-semibold text-sm transition-colors ${
                                 activeTab === 'invoices'
-                                    ? 'border-blue-600 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-accent text-accent'
+                                    : 'border-transparent text-muted hover:text-ink hover:border-line'
                             }`}
                         >
                             <div className="flex items-center space-x-2">

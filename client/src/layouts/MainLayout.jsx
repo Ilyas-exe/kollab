@@ -5,10 +5,9 @@ import Header from '../components/Header';
 
 const MainLayout = ({ children }) => {
   return (
-    // Use the new 'background' color for the entire page
-    <div className="bg-background min-h-screen">
+    <div className="app-shell">
       <Header />
-      <main className="container mx-auto p-6">
+      <main className="page-wrap py-8">
         {/* Render children if provided, otherwise use Outlet for nested routes */}
         {children || <Outlet />}
       </main>
