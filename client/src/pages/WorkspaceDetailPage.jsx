@@ -73,9 +73,9 @@ const WorkspaceDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <div className="inline-block animate-spin h-12 w-12 border-2 border-accent border-t-transparent rounded-full"></div>
+          <div className="inline-block animate-spin h-10 w-10 border-2 border-accent border-t-transparent rounded-full" />
           <p className="mt-4 text-sm text-muted">Loading projects...</p>
         </div>
       </div>
@@ -83,213 +83,190 @@ const WorkspaceDetailPage = () => {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        {/* Page Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <Link 
-                  to="/dashboard"
-                  className="text-muted hover:text-accent transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </Link>
-                <h1 className="text-3xl font-semibold text-ink">Projects</h1>
+    <div className="space-y-8 animate-fade-in">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-muted">
+        <Link to="/dashboard" className="hover:text-ink transition-colors">Dashboard</Link>
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+        <span className="text-ink font-medium">Projects</span>
+      </div>
+
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-ink" style={{ fontFamily: 'Outfit, Inter, sans-serif' }}>Projects</h1>
+          <p className="text-sm text-muted mt-1">Manage and organize your workspace projects</p>
+        </div>
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="btn btn-primary text-sm"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          New Project
+        </button>
+      </div>
+
+      {/* Projects Grid */}
+      {projects.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {projects.map((project, i) => (
+            <div key={project._id} className="card-interactive p-6 animate-fade-in-up" style={{ animationDelay: `${i * 75}ms` }}>
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-sm" style={{ background: `linear-gradient(135deg, ${['#4f6ef7', '#34d399', '#fb923c', '#ec4899', '#7c3aed'][i % 5]} 0%, ${['#3451db', '#059669', '#ea580c', '#db2777', '#6d28d9'][i % 5]} 100%)` }}>
+                  {project.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => startEdit(project)}
+                    className="p-1.5 rounded-lg text-muted hover:text-ink hover:bg-gray-100 transition-all"
+                    title="Edit project"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProject(project)}
+                    className="p-1.5 rounded-lg text-muted hover:text-red-500 hover:bg-red-50 transition-all"
+                    title="Delete project"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <p className="text-sm text-muted ml-9">Manage and organize your workspace projects</p>
+              
+              <h3 className="font-semibold text-base text-ink mb-1">{project.name}</h3>
+              
+              {project.description && (
+                <p className="text-sm text-muted line-clamp-2 mb-4">{project.description}</p>
+              )}
+
+              {!project.description && (
+                <p className="text-sm text-muted mb-4">{project.members?.length || 0} member{(project.members?.length || 0) !== 1 ? 's' : ''}</p>
+              )}
+              
+              <Link
+                to={`/projects/${project._id}`}
+                className="btn btn-primary w-full text-sm"
+              >
+                Open Project
+              </Link>
             </div>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="btn btn-primary"
-            >
-              <span className="flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                <span>New Project</span>
-              </span>
-            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state border border-dashed border-line rounded-2xl">
+          <div className="empty-state-icon">
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-ink mb-2">No Projects Yet</h3>
+          <p className="text-sm text-muted mb-6 max-w-md">
+            Get started by creating your first project. Projects help you organize tasks and collaborate with your team.
+          </p>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="btn btn-primary"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Create First Project
+          </button>
+        </div>
+      )}
+
+      {isModalOpen && (
+        <CreateProjectModal
+          workspaceId={workspaceId}
+          onClose={() => setIsModalOpen(false)}
+          onProjectCreated={handleProjectCreated}
+        />
+      )}
+
+      {/* Edit Project Modal */}
+      {editingProject && (
+        <div className="modal-overlay" onClick={() => setEditingProject(null)}>
+          <div className="modal-card max-w-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-5 border-b border-line">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-pastel-blue flex items-center justify-center">
+                    <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-ink">Edit Project</h2>
+                    <p className="text-sm text-muted">Update project details</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setEditingProject(null)}
+                  className="p-1.5 rounded-lg text-muted hover:text-ink hover:bg-gray-100 transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleUpdateProject}>
+              <div className="px-6 py-5 space-y-5">
+                <div>
+                  <label htmlFor="editProjectName" className="block text-sm font-medium text-ink mb-1.5">
+                    Project Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="editProjectName"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    placeholder="e.g., Q4 Marketing Campaign"
+                    required
+                    autoFocus
+                    className="input"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="editProjectDescription" className="block text-sm font-medium text-ink mb-1.5">
+                    Description <span className="text-muted text-xs font-normal">(Optional)</span>
+                  </label>
+                  <textarea
+                    id="editProjectDescription"
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    placeholder="Brief description of what this project is about..."
+                    rows="3"
+                    className="input resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="px-6 py-4 bg-gray-50 flex justify-end gap-3 border-t border-line">
+                <button type="button" onClick={() => setEditingProject(null)} className="btn text-sm">
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary text-sm">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Save Changes
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-
-        {/* Projects Grid */}
-        {projects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map(project => (
-              <div key={project._id} className="card p-6">
-                <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 rounded-md bg-accent/10 flex items-center justify-center text-accent">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted">
-                    <button
-                      onClick={() => startEdit(project)}
-                          className="p-2 rounded-full text-muted hover:text-ink hover:bg-paper transition-colors"
-                      title="Edit project"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProject(project)}
-                          className="p-2 rounded-full text-muted hover:text-danger hover:bg-paper transition-colors"
-                      title="Delete project"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                    <span className="text-sm text-muted">{project.members?.length || 0}</span>
-                  </div>
-                </div>
-                
-                <h3 className="font-semibold text-lg text-ink mb-2">
-                  {project.name}
-                </h3>
-                
-                {project.description && (
-                  <p className="text-sm text-muted line-clamp-2 mb-4">
-                    {project.description}
-                  </p>
-                )}
-                
-                <Link
-                  to={`/projects/${project._id}`}
-                  className="btn btn-primary w-full"
-                >
-                  Open Project
-                </Link>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16 px-6 bg-surface border border-line border-dashed">
-            <div className="w-16 h-16 border border-line bg-paper flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-ink mb-2">No Projects Yet</h3>
-            <p className="text-sm text-muted mb-6 max-w-md mx-auto">
-              Get started by creating your first project. Projects help you organize tasks and collaborate with your team.
-            </p>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="btn btn-primary"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              <span>Create First Project</span>
-            </button>
-          </div>
-        )}
-
-        {isModalOpen && (
-          <CreateProjectModal
-            workspaceId={workspaceId}
-            onClose={() => setIsModalOpen(false)}
-            onProjectCreated={handleProjectCreated}
-          />
-        )}
-
-        {/* Edit Project Modal */}
-        {editingProject && (
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 animate-fadeIn"
-            onClick={() => setEditingProject(null)}
-          >
-            <div 
-              className="card-strong w-full max-w-lg mx-4 animate-slideUp"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="px-6 py-5 border-b border-line bg-paper">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 border border-line bg-surface flex items-center justify-center">
-                      <svg className="w-5 h-5 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-semibold text-ink">Edit Project</h2>
-                      <p className="text-sm text-muted">Update project details</p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setEditingProject(null)}
-                    className="text-muted hover:text-ink hover:bg-surface p-1 transition-all"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              <form onSubmit={handleUpdateProject}>
-                <div className="px-6 py-5 space-y-5">
-                  <div>
-                    <label htmlFor="editProjectName" className="label mb-2 block">
-                      Project Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="editProjectName"
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      placeholder="e.g., Q4 Marketing Campaign"
-                      required
-                      autoFocus
-                      className="input"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="editProjectDescription" className="label mb-2 block">
-                      Description <span className="text-gray-500 text-xs font-normal">(Optional)</span>
-                    </label>
-                    <textarea
-                      id="editProjectDescription"
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
-                      placeholder="Brief description of what this project is about..."
-                      rows="3"
-                      className="input resize-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="px-6 py-4 bg-paper flex justify-end gap-3 border-t border-line">
-                  <button 
-                    type="button" 
-                    onClick={() => setEditingProject(null)}
-                    className="btn"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className="btn btn-primary"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Save Changes</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

@@ -1,15 +1,26 @@
 import React from 'react'
 
 export default function StatusBadge({ status }) {
-  // Use softer pastel backgrounds from design system
   const map = {
-    Paid: { bg: 'var(--pastel-green)', color: '#065f46' },
-    Overdue: { bg: 'var(--pastel-red)', color: '#7f1d1d' },
-    Pending: { bg: 'var(--pastel-blue)', color: '#1e3a8a' },
+    Paid: 'badge-success',
+    Done: 'badge-success',
+    Delivered: 'badge-success',
+    Active: 'badge-success',
+    Overdue: 'badge-danger',
+    Cancelled: 'badge-danger',
+    Failed: 'badge-danger',
+    Pending: 'badge-info',
+    Sent: 'badge-info',
+    'In Progress': 'badge-info',
+    'In Transit': 'badge-warning',
+    Draft: 'badge-neutral',
+    'To Do': 'badge-neutral',
   }
-  const style = map[status] || { bg: 'var(--pastel-blue)', color: 'var(--ink)' }
+
+  const cls = map[status] || 'badge-neutral';
+
   return (
-    <span style={{ backgroundColor: style.bg, color: style.color }} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border border-transparent">
+    <span className={`${cls} inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-semibold`}>
       {status}
     </span>
   )

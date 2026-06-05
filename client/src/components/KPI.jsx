@@ -1,18 +1,30 @@
 import React from 'react'
 
-export default function KPI({ title, value, subtitle, color = 'blue' }) {
-  const cls = {
-    blue: 'kpi kpi-blue',
-    orange: 'kpi kpi-orange',
-    green: 'kpi kpi-green',
-    red: 'kpi kpi-red',
-  }[color]
+export default function KPI({ title, value, subtitle, color = 'blue', icon }) {
+  const colorMap = {
+    blue: { bg: 'bg-pastel-blue', iconBg: 'kpi-icon-blue' },
+    orange: { bg: 'bg-pastel-orange', iconBg: 'kpi-icon-orange' },
+    green: { bg: 'bg-pastel-green', iconBg: 'kpi-icon-green' },
+    red: { bg: 'bg-pastel-red', iconBg: 'kpi-icon-red' },
+    purple: { bg: 'bg-pastel-purple', iconBg: 'kpi-icon-purple' },
+  }
+
+  const c = colorMap[color] || colorMap.blue;
 
   return (
-    <div className={`${cls}`}>
-      <div className="text-sm text-gray-600">{title}</div>
-      <div className="mt-2 text-2xl font-semibold text-gray-900">{value}</div>
-      {subtitle && <div className="mt-1 text-sm text-gray-600">{subtitle}</div>}
+    <div className="card-kpi">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="kpi-label">{title}</p>
+          <p className="kpi-value">{value}</p>
+          {subtitle && <p className="kpi-subtitle">{subtitle}</p>}
+        </div>
+        {icon && (
+          <div className={`kpi-icon ${c.iconBg}`}>
+            {icon}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
